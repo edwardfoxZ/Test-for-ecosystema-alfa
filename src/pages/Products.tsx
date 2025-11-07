@@ -43,7 +43,7 @@ export const Products = () => {
   return (
     <div
       className="relative max-w-[2000px] h-[90vh] grid grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg
-          py-32 px-24 rounded-2xl overflow-hidden"
+          py-32 px-24 rounded-xl overflow-hidden"
     >
       {currentItems.map((item) => (
         <Link key={item.id} to={`product/${item.id}`} className="group">
