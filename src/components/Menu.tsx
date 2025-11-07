@@ -9,7 +9,7 @@ export const Menu: React.FC<menu> = ({ isOn, setLikes }) => {
   return (
     <>
       <button
-        className={`relative bg-purple-500 text-white text-xl 
+        className={`relative bg-purple-500 text-white md:text-xl 
             ${
               isOn
                 ? "w-full h-full rounded-0 p-2 -translate-x-3"

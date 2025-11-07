@@ -16,9 +16,9 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   return (
     <>
-      <div className="flex flex-row gap-5 group mx-auto">
+      <div className="w-full h-full md:flex flex-row gap-5 group mx-auto">
         <div
-          className="relative w-[300px] h-[400px] group-hover:shadow-2xl rounded-xl group-hover:shadow-slate-100/15
+          className="relative w-[280px] md:max-w-[250px] h-[400px] group-hover:shadow-2xl rounded-xl group-hover:shadow-slate-100/15
                  group-hover:drop-shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer overflow-hidden"
         >
           <img

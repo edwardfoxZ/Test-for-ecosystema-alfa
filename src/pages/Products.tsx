@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card } from "../components/Card";
 import { fakeData } from "../data/fakeData";
-import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
+import {
+  MdNavigateNext,
+  MdNavigateBefore,
+  MdKeyboardArrowDown,
+} from "react-icons/md";
 import { Link, useSearchParams } from "react-router-dom";
 import { Menu } from "../components/Menu";
 import { FcLikePlaceholder, FcLike } from "react-icons/fc";
@@ -29,6 +33,7 @@ export const Products = () => {
   const { setLikes, likes } = useSetLikes();
 
   const currentPage = Number(searchParams.get("page")) || 1;
+  const [visibleItems, setVisibleItems] = useState(5);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -40,6 +45,12 @@ export const Products = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
 
+  // Mobile Pagination
+  const handleLoadMore = () => {
+    setVisibleItems((prev) => Math.min(prev + itemsPerPage, products.length));
+  };
+
+  // Desktop Pagination
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setSearchParams({ page: pageNumber.toString() });
@@ -47,21 +58,23 @@ export const Products = () => {
     }
   };
 
+  const itemsToRender =
+    window.innerWidth < 768 ? products.slice(0, visibleItems) : currentItems;
+
   return (
     <div
-      className="relative max-w-[2000px] h-[90vh] grid grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg
-          py-32 px-24 rounded-xl overflow-hidden"
+      className="relative max-w-[1750px] md:h-[90vh] grid grid-cols-1 md:grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg
+          py-32 px-24 rounded-xl md:overflow-hidden"
     >
       {/* Nav */}
       <div
-        className="absolute top-10 left-10 max-w-[500px]"
+        className="fixed md:absolute top-10 left-10 max-w-[500px]"
         onClick={() => setToggleHamOn((prev) => !prev)}
       >
         <Menu isOn={isToggleHambOn} setLikes={setLikes} />
       </div>
-
       {/* Cards */}
-      {currentItems.map((item) => (
+      {itemsToRender.map((item) => (
         <main className="relative group">
           <Link
             key={item.id}
@@ -86,9 +99,22 @@ export const Products = () => {
           </div>
         </main>
       ))}
+      {/* Pagination Controls (MOBILE) */}
+      <div className="md:hidden flex justify-center mt-8 col-span-full">
+        {visibleItems < products.length && (
+          <button
+            onClick={handleLoadMore}
+            className="flex items-center p-2 bg-purple-600 text-white rounded-full
+                     transition duration-300 ease-in-out hover:scale-105 hover:bg-purple-700 hover:shadow-lg
+                     active:scale-95"
+          >
+            <MdKeyboardArrowDown size={22} />
+          </button>
+        )}
+      </div>
 
       {/* Pagination Controls */}
-      <div className="absolute top-3/4">
+      <div className="hidden md:block absolute top-3/4">
         {products.length > 0 && (
           <div className="flex justify-center items-center mx-auto mt-8 gap-4">
             <button

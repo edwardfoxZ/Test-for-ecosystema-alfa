@@ -63,7 +63,7 @@ export const Product = () => {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto bg-[#3d247116] backdrop-blur-lg py-12 px-8 rounded-2xl mt-8 mb-8">
+    <div className="max-w-[300px] md:max-w-[1200px] mx-auto bg-[#3d247116] backdrop-blur-lg py-12 px-8 rounded-2xl mt-8 mb-8">
       <Link
         to={`/products?page=${page}`}
         className="mb-6 inline-block p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300"
@@ -73,7 +73,7 @@ export const Product = () => {
 
       <div className="flex flex-col md:flex-row gap-8 items-center">
         {/* Image Section */}
-        <div className="w-full md:w-1/2">
+        <div className="w-2/3 md:w-1/2">
           <img
             src={product.image}
             alt={product.title}
@@ -83,26 +83,34 @@ export const Product = () => {
 
         {/* Details Section */}
         <div className="w-full md:w-1/2 flex flex-col justify-between">
-          <h1 className="text-3xl font-bold text-white mb-4">
+          <h1 className="md:text-3xl font-bold text-white mb-4">
             {product.title}
           </h1>
-          <p className="text-white text-lg mb-6">{product.description}</p>
+          <p className="text-white text-sm md:text-lg mb-6">
+            {product.description}
+          </p>
           <div className="flex items-center mb-4">
-            <span className="text-yellow-400 mr-2">★</span>
-            <span className="text-white">
+            <span className="text-yellow-400 mr-2 text-sm md:text-lg">★</span>
+            <span className="text-white text-xs md:text-sm">
               {product.rating.rate} ({product.rating.count} reviews)
             </span>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-6">
+          <h2 className="md:text-2xl font-bold text-white mb-6">
             {product.price}₽
           </h2>
 
           <div className="flex gap-4">
-            <button className="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition duration-300 hover:scale-105 active:scale-95">
+            <button
+              className="p-2 md:px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition 
+                duration-300 hover:scale-105 active:scale-95 text-sm md:text-base"
+            >
               Add to Cart
             </button>
-            <button className="p-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition duration-300 hover:scale-105 active:scale-95">
-              <FcLikePlaceholder size={24} />
+            <button
+              className="p-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition 
+                duration-300 hover:scale-105 active:scale-95 text-lg"
+            >
+              <FcLikePlaceholder />
             </button>
           </div>
         </div>
