@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Card } from "../components/Card";
 import { fakeData } from "../data/fakeData";
 import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { Menu } from "../components/Menu";
 
 export interface Product {
   id: number;
@@ -21,7 +22,10 @@ export interface Product {
 
 export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isToggleHambOn, setToggleHamOn] = useState(false);
+
+  const currentPage = Number(searchParams.get("page")) || 1;
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -29,14 +33,14 @@ export const Products = () => {
   }, []);
 
   const totalPages = Math.ceil(products.length / itemsPerPage);
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
+      setSearchParams({ page: pageNumber.toString() });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -45,8 +49,21 @@ export const Products = () => {
       className="relative max-w-[2000px] h-[90vh] grid grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg
           py-32 px-24 rounded-xl overflow-hidden"
     >
+      {/* Nav */}
+      <div
+        className="absolute top-10 left-10 max-w-[500px]"
+        onClick={() => setToggleHamOn((prev) => !prev)}
+      >
+        <Menu isOn={isToggleHambOn} />
+      </div>
+
+      {/* Cards */}
       {currentItems.map((item) => (
-        <Link key={item.id} to={`product/${item.id}`} className="group">
+        <Link
+          key={item.id}
+          to={`product/${item.id}?page=${currentPage}`}
+          className="group"
+        >
           <Card
             image={item.image}
             title={item.title}

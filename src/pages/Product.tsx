@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 import { fakeData } from "../data/fakeData";
 import type { Product as ProductType } from "./Products";
@@ -7,9 +7,13 @@ import { MdNavigateBefore } from "react-icons/md";
 
 export const Product = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const [product, setProduct] = useState<ProductType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const searchParams = new URLSearchParams(location.search);
+  const page = searchParams.get("page") || "1";
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -49,7 +53,7 @@ export const Product = () => {
       <div className="flex flex-col justify-center items-center h-[90vh] text-white">
         <p>{error || "Product not found"}</p>
         <Link
-          to="/products"
+          to={`/products?page=${page}`}
           className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition duration-300"
         >
           Back to Products
@@ -61,7 +65,7 @@ export const Product = () => {
   return (
     <div className="max-w-[1200px] mx-auto bg-[#3d247116] backdrop-blur-lg py-12 px-8 rounded-2xl mt-8 mb-8">
       <Link
-        to="/products"
+        to={`/products?page=${page}`}
         className="mb-6 inline-block p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300"
       >
         <MdNavigateBefore />
