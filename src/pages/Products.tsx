@@ -4,6 +4,8 @@ import { fakeData } from "../data/fakeData";
 import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 import { Link, useSearchParams } from "react-router-dom";
 import { Menu } from "../components/Menu";
+import { FcLikePlaceholder, FcLike } from "react-icons/fc";
+import { useSetLikes } from "../hooks/setLikes";
 
 export interface Product {
   id: number;
@@ -24,6 +26,7 @@ export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isToggleHambOn, setToggleHamOn] = useState(false);
+  const { setLikes, likes } = useSetLikes();
 
   const currentPage = Number(searchParams.get("page")) || 1;
   const itemsPerPage = 5;
@@ -54,24 +57,34 @@ export const Products = () => {
         className="absolute top-10 left-10 max-w-[500px]"
         onClick={() => setToggleHamOn((prev) => !prev)}
       >
-        <Menu isOn={isToggleHambOn} />
+        <Menu isOn={isToggleHambOn} setLikes={setLikes} />
       </div>
 
       {/* Cards */}
       {currentItems.map((item) => (
-        <Link
-          key={item.id}
-          to={`product/${item.id}?page=${currentPage}`}
-          className="group"
-        >
-          <Card
-            image={item.image}
-            title={item.title}
-            description={item.description}
-            rating={item.rating.rate}
-            price={item.price}
-          />
-        </Link>
+        <main className="relative group">
+          <Link
+            key={item.id}
+            to={`product/${item.id}?page=${currentPage}`}
+            className="group relative"
+          >
+            <Card
+              image={item.image}
+              title={item.title}
+              description={item.description}
+              rating={item.rating.rate}
+              price={item.price}
+            />
+          </Link>
+          <div
+            className="opacity-0 group-hover:opacity-100 absolute bottom-0 left-3 p-2 text-2xl z-30
+              transition-opacity duration-300 delay-100 ease-in-out"
+          >
+            <button onClick={() => setLikes((prev) => !prev)}>
+              {likes ? <FcLike /> : <FcLikePlaceholder />}
+            </button>
+          </div>
+        </main>
       ))}
 
       {/* Pagination Controls */}

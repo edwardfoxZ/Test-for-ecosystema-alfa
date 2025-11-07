@@ -1,5 +1,4 @@
 import React from "react";
-import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 
 interface CardProps {
   image: string;
@@ -44,11 +43,6 @@ export const Card: React.FC<CardProps> = ({
 
               <p className="text-white text-sm line-clamp-2">{description}</p>
               <h3 className="text-white mt-3 font-bold">{price}₽</h3>
-            </div>
-            <div className="p-2">
-              <button>
-                <FcLikePlaceholder />
-              </button>
             </div>
           </span>
         </div>
