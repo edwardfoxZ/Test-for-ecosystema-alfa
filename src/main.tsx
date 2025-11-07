@@ -10,13 +10,14 @@ import {
 import "./index.css";
 import App from "./App.tsx";
 import { Products } from "./pages/Products.tsx";
+import { Product } from "./pages/Product.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route index path="/" element={<Navigate to="/products" />} />
-      <Route index path="/products" element={<Products />} />
-      {/* <Route path="/products/:id" element={} /> */}
+      <Route index element={<Navigate to="/products" />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="products/product/:id" element={<Product />} />
     </Route>
   )
 );

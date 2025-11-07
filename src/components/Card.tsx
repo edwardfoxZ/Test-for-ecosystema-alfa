@@ -1,6 +1,5 @@
 import React from "react";
-import { FcLikePlaceholder } from "react-icons/fc";
-import { FcLike } from "react-icons/fc";
+import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 
 interface CardProps {
   image: string;
@@ -21,15 +20,13 @@ export const Card: React.FC<CardProps> = ({
       <div className="flex flex-row gap-5 group mx-auto">
         <div
           className="relative w-[300px] h-[400px] group-hover:shadow-2xl group-hover:shadow-slate-100/15
-                 group-hover:drop-shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer"
+                 group-hover:drop-shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer overflow-hidden"
         >
-          <div className="max-w-[150px] max-h-fit object-cover mx-auto">
-            <img
-              className="w-full h-full rounded-xl object-cover"
-              src={image}
-              alt={title}
-            />
-          </div>
+          <img
+            className="w-[150px] min-h-[100px] mx-auto mt-5 rounded-xl object-cover"
+            src={image}
+            alt={title}
+          />
 
           {/* Layers over the image */}
           <span className="absolute bottom-0 left-0 w-full h-full rounded-lg backdrop-brightness-90" />
@@ -41,11 +38,13 @@ export const Card: React.FC<CardProps> = ({
               <h3 className="text-white font-extrabold line-clamp-1">
                 {title}
               </h3>
+              <span className="text-yellow-400 mr-2">
+                ★ <p className="inline-block text-white">{rating}</p>
+              </span>
+
               <p className="text-white text-sm line-clamp-2">{description}</p>
-              <h3 className="text-white mt-2">★ {rating}</h3>
               <h3 className="text-white mt-3 font-bold">{price}₽</h3>
             </div>
-
             <div className="p-2">
               <button>
                 <FcLikePlaceholder />
