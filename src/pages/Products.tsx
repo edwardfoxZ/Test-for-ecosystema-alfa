@@ -37,9 +37,7 @@ export const Products = () => {
   const itemsPerPage = 5;
   const showFavorites = searchParams.get("favorites") === "true";
 
-  const setShowFavorites = (
-    value: boolean | ((prev: boolean) => boolean)
-  ) => {
+  const setShowFavorites = (value: boolean | ((prev: boolean) => boolean)) => {
     let newValue: boolean;
     if (typeof value === "function") {
       newValue = value(showFavorites);
@@ -135,6 +133,7 @@ export const Products = () => {
           isOn={isToggleHambOn}
           setLiked={setShowFavorites}
           liked={showFavorites}
+          likedList={likesList}
         />
       </div>
 
