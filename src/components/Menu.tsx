@@ -34,7 +34,9 @@ export const Menu: React.FC<menu> = ({ setIsOn, isOn, setLiked, liked }) => {
             className="text-white hover:text-white/50 transition-colors duration-300 ease-linear"
           >
             <p
-              className={`text-lg p-2 ${liked ? "text-red-300" : "text-white"}`}
+              className={`text-sm md:text-lg p-2 ${
+                liked ? "text-red-300" : "text-white"
+              }`}
             >
               Favorites
             </p>

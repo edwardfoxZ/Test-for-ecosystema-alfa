@@ -1,8 +1,20 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export const useSetLikes = () => {
   const [likesList, setLikesList] = useState<number[]>([]);
-  const [liked, setLiked] = useState(false);
+
+  // Load from localStorage
+  useEffect(() => {
+    const storedLikes = localStorage.getItem("likesList");
+    if (storedLikes) {
+      setLikesList(JSON.parse(storedLikes));
+    }
+  }, []);
+
+  // Save to localStorage
+  useEffect(() => {
+    localStorage.setItem("likesList", JSON.stringify(likesList));
+  }, [likesList]);
 
   // Toggle product like/unlike
   const toggleLike = useCallback((productId: number) => {
@@ -18,5 +30,5 @@ export const useSetLikes = () => {
     [likesList]
   );
 
-  return { likesList, toggleLike, isLiked, setLiked, liked };
+  return { likesList, toggleLike, isLiked };
 };

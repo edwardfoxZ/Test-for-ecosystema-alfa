@@ -6,7 +6,7 @@ import {
   MdNavigateBefore,
   MdKeyboardArrowDown,
 } from "react-icons/md";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { Menu } from "../components/Menu";
 import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 import { useSetLikes } from "../hooks/setLikes";
@@ -29,6 +29,7 @@ export interface Product {
 export const Products = () => {
   const { isLiked, toggleLike, likesList } = useSetLikes();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const [isToggleHambOn, setToggleHamOn] = useState(false);
 
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -139,7 +140,7 @@ export const Products = () => {
 
       {/* Cards or No Favorites Message */}
       {showFavorites && filteredProducts.length === 0 ? (
-        <div className="col-span-full text-center text-white py-10 text-xl">
+        <div className="col-span-full flex items-center justify-center text-center text-white py-10 text-xl min-h-[50vh]">
           No favorites yet. Start liking some products!
         </div>
       ) : (
@@ -158,7 +159,7 @@ export const Products = () => {
               />
             </Link>
             <div
-              className="opacity-0 group-hover:opacity-100 absolute bottom-0 left-3 p-2 text-2xl z-30
+              className="absolute bottom-0 left-3 p-2 text-2xl z-30 opacity-100 md:opacity-0 md:group-hover:opacity-100
               transition-opacity duration-300 delay-100 ease-in-out"
             >
               <button onClick={() => toggleLike(item.id)}>
