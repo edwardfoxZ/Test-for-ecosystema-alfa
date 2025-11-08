@@ -16,9 +16,6 @@ export const Product = () => {
 
   const productId = Number(id);
 
-  const searchParams = new URLSearchParams(location.search);
-  const page = searchParams.get("page") || "1";
-
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
