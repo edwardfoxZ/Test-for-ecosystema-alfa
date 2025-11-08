@@ -30,10 +30,10 @@ export const Card: React.FC<CardProps> = ({
           {/* Layers over the image */}
           <span className="absolute bottom-0 left-0 w-full h-full rounded-lg backdrop-brightness-90" />
           <span
-            className="absolute bottom-0 left-0 w-full opacity-0 group-hover:opacity-100 h-0 group-hover:h-1/2 bg-purple-600/25 
+            className="absolute bottom-0 left-0 w-full md:opacity-0 group-hover:opacity-100 h-1/2 md:h-0 group-hover:h-1/2 bg-purple-600/25 
                 rounded-b-xl transition-all duration-500 ease-out overflow-hidden p-4 flex flex-col backdrop-blur-lg"
           >
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300 ease-out">
+            <div className="md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300 ease-out">
               <h3 className="text-white font-extrabold line-clamp-1">
                 {title}
               </h3>
