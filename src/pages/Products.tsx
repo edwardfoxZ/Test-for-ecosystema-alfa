@@ -27,16 +27,37 @@ export interface Product {
 // We use https://fakestoreapi.com/products for data and put them in fakeData.js
 
 export const Products = () => {
-  const { isLiked, toggleLike, likesList, liked, setLiked } = useSetLikes();
+  const { isLiked, toggleLike, likesList } = useSetLikes();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isToggleHambOn, setToggleHamOn] = useState(false);
 
   const currentPage = Number(searchParams.get("page")) || 1;
   const [visibleItems, setVisibleItems] = useState(5);
   const itemsPerPage = 5;
+  const showFavorites = searchParams.get("favorites") === "true";
+
+  const setShowFavorites = (
+    value: boolean | ((prev: boolean) => boolean)
+  ) => {
+    let newValue: boolean;
+    if (typeof value === "function") {
+      newValue = value(showFavorites);
+    } else {
+      newValue = value;
+    }
+
+    const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
+    if (newValue) {
+      params.set("favorites", "true");
+    } else {
+      params.delete("favorites");
+    }
+    setSearchParams(params);
+  };
 
   const fullProducts = fakeData;
-  const filteredProducts = liked
+  const filteredProducts = showFavorites
     ? fullProducts.filter((product) => likesList.includes(product.id))
     : fullProducts;
 
@@ -48,6 +69,36 @@ export const Products = () => {
     indexOfLastItem
   );
 
+  // Clamp currentPage if out of bounds
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    let changed = false;
+
+    if (currentPage > totalPages && totalPages > 0) {
+      params.set("page", totalPages.toString());
+      changed = true;
+    } else if (currentPage < 1) {
+      params.set("page", "1");
+      changed = true;
+    }
+
+    if (changed) {
+      setSearchParams(params);
+    }
+  }, [currentPage, totalPages, searchParams, setSearchParams]);
+
+  // Reset visibleItems on filter change
+  useEffect(() => {
+    setVisibleItems(itemsPerPage);
+  }, [showFavorites]);
+
+  // Adjust visibleItems if filtered length changes (e.g., unliking items)
+  useEffect(() => {
+    if (window.innerWidth < 768 && visibleItems > filteredProducts.length) {
+      setVisibleItems(filteredProducts.length);
+    }
+  }, [filteredProducts.length, visibleItems]);
+
   // Mobile Pagination
   const handleLoadMore = () => {
     setVisibleItems((prev) =>
@@ -58,7 +109,10 @@ export const Products = () => {
   // Desktop Pagination
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setSearchParams({ page: pageNumber.toString() });
+      setSearchParams((prev) => {
+        prev.set("page", pageNumber.toString());
+        return prev;
+      });
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -67,11 +121,6 @@ export const Products = () => {
     window.innerWidth < 768
       ? filteredProducts.slice(0, visibleItems)
       : currentItems;
-
-  useEffect(() => {
-    setSearchParams({ page: "1" });
-    setVisibleItems(5);
-  }, [liked, setSearchParams]);
 
   return (
     <div
@@ -83,36 +132,42 @@ export const Products = () => {
         <Menu
           setIsOn={setToggleHamOn}
           isOn={isToggleHambOn}
-          setLiked={setLiked}
-          liked={liked}
+          setLiked={setShowFavorites}
+          liked={showFavorites}
         />
       </div>
 
-      {/* Cards */}
-      {itemsToRender.map((item) => (
-        <main className="relative group" key={item.id}>
-          <Link
-            to={`product/${item.id}?page=${currentPage}`}
-            className="group relative"
-          >
-            <Card
-              image={item.image}
-              title={item.title}
-              description={item.description}
-              rating={item.rating.rate}
-              price={item.price}
-            />
-          </Link>
-          <div
-            className="opacity-0 group-hover:opacity-100 absolute bottom-0 left-3 p-2 text-2xl z-30
+      {/* Cards or No Favorites Message */}
+      {showFavorites && filteredProducts.length === 0 ? (
+        <div className="col-span-full text-center text-white py-10 text-xl">
+          No favorites yet. Start liking some products!
+        </div>
+      ) : (
+        itemsToRender.map((item) => (
+          <main className="relative group" key={item.id}>
+            <Link
+              to={`product/${item.id}${location.search}`}
+              className="group relative"
+            >
+              <Card
+                image={item.image}
+                title={item.title}
+                description={item.description}
+                rating={item.rating.rate}
+                price={item.price}
+              />
+            </Link>
+            <div
+              className="opacity-0 group-hover:opacity-100 absolute bottom-0 left-3 p-2 text-2xl z-30
               transition-opacity duration-300 delay-100 ease-in-out"
-          >
-            <button onClick={() => toggleLike(item.id)}>
-              {isLiked(item.id) ? <FcLike /> : <FcLikePlaceholder />}
-            </button>
-          </div>
-        </main>
-      ))}
+            >
+              <button onClick={() => toggleLike(item.id)}>
+                {isLiked(item.id) ? <FcLike /> : <FcLikePlaceholder />}
+              </button>
+            </div>
+          </main>
+        ))
+      )}
       {/* Pagination Controls (MOBILE) */}
       <div className="md:hidden flex justify-center mt-8 col-span-full">
         {visibleItems < filteredProducts.length && (
@@ -141,7 +196,7 @@ export const Products = () => {
               <MdNavigateBefore />
             </button>
 
-            {/* Optional: Render page numbers */}
+            {/* Render page numbers */}
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index + 1}

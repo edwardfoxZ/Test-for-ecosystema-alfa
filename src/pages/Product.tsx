@@ -4,6 +4,7 @@ import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 import { fakeData } from "../data/fakeData";
 import type { Product as ProductType } from "./Products";
 import { MdNavigateBefore } from "react-icons/md";
+import { useSetLikes } from "../hooks/setLikes";
 
 export const Product = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,6 +12,9 @@ export const Product = () => {
   const [product, setProduct] = useState<ProductType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isLiked, toggleLike } = useSetLikes();
+
+  const productId = Number(id);
 
   const searchParams = new URLSearchParams(location.search);
   const page = searchParams.get("page") || "1";
@@ -53,7 +57,7 @@ export const Product = () => {
       <div className="flex flex-col justify-center items-center h-[90vh] text-white">
         <p>{error || "Product not found"}</p>
         <Link
-          to={`/products?page=${page}`}
+          to={`/products${location.search}`}
           className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition duration-300"
         >
           Back to Products
@@ -65,7 +69,7 @@ export const Product = () => {
   return (
     <div className="max-w-[300px] md:max-w-[1200px] mx-auto bg-[#3d247116] backdrop-blur-lg py-12 px-8 rounded-2xl mt-8 mb-8">
       <Link
-        to={`/products?page=${page}`}
+        to={`/products${location.search}`}
         className="mb-6 inline-block p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300"
       >
         <MdNavigateBefore />
@@ -107,10 +111,11 @@ export const Product = () => {
               Add to Cart
             </button>
             <button
+              onClick={() => toggleLike(productId)}
               className="p-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition 
                 duration-300 hover:scale-105 active:scale-95 text-lg"
             >
-              <FcLikePlaceholder />
+              {isLiked(productId) ? <FcLike /> : <FcLikePlaceholder />}
             </button>
           </div>
         </div>
