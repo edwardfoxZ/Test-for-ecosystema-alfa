@@ -27,27 +27,32 @@ export interface Product {
 // We use https://fakestoreapi.com/products for data and put them in fakeData.js
 
 export const Products = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const { isLiked, toggleLike, likesList, liked, setLiked } = useSetLikes();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isToggleHambOn, setToggleHamOn] = useState(false);
-  const { setLikes, likes } = useSetLikes();
 
   const currentPage = Number(searchParams.get("page")) || 1;
   const [visibleItems, setVisibleItems] = useState(5);
   const itemsPerPage = 5;
 
-  useEffect(() => {
-    setProducts(fakeData);
-  }, []);
+  const fullProducts = fakeData;
+  const filteredProducts = liked
+    ? fullProducts.filter((product) => likesList.includes(product.id))
+    : fullProducts;
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredProducts.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   // Mobile Pagination
   const handleLoadMore = () => {
-    setVisibleItems((prev) => Math.min(prev + itemsPerPage, products.length));
+    setVisibleItems((prev) =>
+      Math.min(prev + itemsPerPage, filteredProducts.length)
+    );
   };
 
   // Desktop Pagination
@@ -59,7 +64,14 @@ export const Products = () => {
   };
 
   const itemsToRender =
-    window.innerWidth < 768 ? products.slice(0, visibleItems) : currentItems;
+    window.innerWidth < 768
+      ? filteredProducts.slice(0, visibleItems)
+      : currentItems;
+
+  useEffect(() => {
+    setSearchParams({ page: "1" });
+    setVisibleItems(5);
+  }, [liked, setSearchParams]);
 
   return (
     <div
@@ -67,17 +79,19 @@ export const Products = () => {
           py-32 px-24 rounded-xl md:overflow-hidden"
     >
       {/* Nav */}
-      <div
-        className="fixed md:absolute top-10 left-10 max-w-[500px]"
-        onClick={() => setToggleHamOn((prev) => !prev)}
-      >
-        <Menu isOn={isToggleHambOn} setLikes={setLikes} />
+      <div className="fixed md:absolute top-10 left-10 max-w-[500px] z-30">
+        <Menu
+          setIsOn={setToggleHamOn}
+          isOn={isToggleHambOn}
+          setLiked={setLiked}
+          liked={liked}
+        />
       </div>
+
       {/* Cards */}
       {itemsToRender.map((item) => (
-        <main className="relative group">
+        <main className="relative group" key={item.id}>
           <Link
-            key={item.id}
             to={`product/${item.id}?page=${currentPage}`}
             className="group relative"
           >
@@ -93,15 +107,15 @@ export const Products = () => {
             className="opacity-0 group-hover:opacity-100 absolute bottom-0 left-3 p-2 text-2xl z-30
               transition-opacity duration-300 delay-100 ease-in-out"
           >
-            <button onClick={() => setLikes((prev) => !prev)}>
-              {likes ? <FcLike /> : <FcLikePlaceholder />}
+            <button onClick={() => toggleLike(item.id)}>
+              {isLiked(item.id) ? <FcLike /> : <FcLikePlaceholder />}
             </button>
           </div>
         </main>
       ))}
       {/* Pagination Controls (MOBILE) */}
       <div className="md:hidden flex justify-center mt-8 col-span-full">
-        {visibleItems < products.length && (
+        {visibleItems < filteredProducts.length && (
           <button
             onClick={handleLoadMore}
             className="flex items-center p-2 bg-purple-600 text-white rounded-full
@@ -115,7 +129,7 @@ export const Products = () => {
 
       {/* Pagination Controls */}
       <div className="hidden md:block absolute top-3/4">
-        {products.length > 0 && (
+        {filteredProducts.length > 0 && (
           <div className="flex justify-center items-center mx-auto mt-8 gap-4">
             <button
               onClick={() => handlePageChange(currentPage - 1)}

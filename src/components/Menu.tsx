@@ -3,12 +3,15 @@ import { TbMenu2, TbMenu3 } from "react-icons/tb";
 
 interface menu {
   isOn: boolean;
-  setLikes: React.Dispatch<React.SetStateAction<boolean>>;
+  setLiked: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOn: React.Dispatch<React.SetStateAction<boolean>>;
+  liked: boolean;
 }
-export const Menu: React.FC<menu> = ({ isOn, setLikes }) => {
+export const Menu: React.FC<menu> = ({ setIsOn, isOn, setLiked, liked }) => {
   return (
     <>
       <button
+        onClick={() => setIsOn((prev) => !prev)}
         className={`relative bg-purple-500 text-white md:text-xl 
             ${
               isOn
@@ -27,10 +30,14 @@ export const Menu: React.FC<menu> = ({ isOn, setLikes }) => {
             transition-all duration-300 ease-linear`}
         >
           <button
-            onClick={() => setLikes(true)}
+            onClick={() => setLiked((prev) => !prev)}
             className="text-white hover:text-white/50 transition-colors duration-300 ease-linear"
           >
-            <p className="text-lg p-2">Favorites</p>
+            <p
+              className={`text-lg p-2 ${liked ? "text-red-300" : "text-white"}`}
+            >
+              Favorites
+            </p>
           </button>
         </div>
       )}
