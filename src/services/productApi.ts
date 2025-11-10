@@ -1,6 +1,6 @@
 import type { Product } from "../pages/Products";
 
-const API_BASE = "http://localhost:3001";
+const API_BASE = "https://test-for-ecosystema-alfa.onrender.com";
 
 export const productApi = {
   // Get all products

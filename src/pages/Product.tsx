@@ -4,6 +4,7 @@ import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 import type { Product as ProductType } from "./Products";
 import { MdNavigateBefore } from "react-icons/md";
 import { useSetLikes } from "../hooks/setLikes";
+import { productApi } from "../services/productApi";
 
 export const Product = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,16 +22,11 @@ export const Product = () => {
       setError(null);
 
       try {
-        const response = await fetch(`http://localhost:3001/products/${id}`);
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("Product not found");
-          }
-          throw new Error("Failed to load product");
+        if (!id) {
+          throw new Error("No product ID provided");
         }
 
-        const productData = await response.json();
+        const productData = await productApi.getProduct(Number(id));
         setProduct(productData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load product");
@@ -40,12 +36,7 @@ export const Product = () => {
       }
     };
 
-    if (id) {
-      fetchProduct();
-    } else {
-      setError("No product ID provided");
-      setLoading(false);
-    }
+    fetchProduct();
   }, [id]);
 
   if (loading) {

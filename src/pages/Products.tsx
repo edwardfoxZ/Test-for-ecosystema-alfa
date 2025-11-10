@@ -26,8 +26,6 @@ export interface Product {
   };
 }
 
-// Replace fakeData with API calls to http://localhost:3001/products
-
 export const Products = () => {
   const { isLiked, toggleLike, likesList } = useSetLikes();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,26 +36,19 @@ export const Products = () => {
   const [error, setError] = useState<string | null>(null);
 
   const currentPage = Number(searchParams.get("page")) || 1;
-  const [visibleItems, setVisibleItems] = useState(5);
   const itemsPerPage = 5;
   const showFavorites = searchParams.get("favorites") === "true";
 
-  // Fetch products from your local server
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3001/products");
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-        const data = await response.json();
+        const data = await productApi.getProducts();
         setProducts(data);
         setError(null);
       } catch (err) {
         setError("Failed to load products from server");
         console.error("Error fetching products:", err);
-        // Fallback to empty array if server is not available
         setProducts([]);
       } finally {
         setLoading(false);
@@ -97,6 +88,11 @@ export const Products = () => {
     indexOfLastItem
   );
 
+  // Mobile pagination - show first 5 items immediately, then load more on click
+  const [mobileVisibleCount, setMobileVisibleCount] = useState(itemsPerPage);
+  const mobileItems = filteredProducts.slice(0, mobileVisibleCount);
+  const hasMoreMobileItems = mobileVisibleCount < filteredProducts.length;
+
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     let changed = false;
@@ -114,20 +110,14 @@ export const Products = () => {
     }
   }, [currentPage, totalPages, searchParams, setSearchParams]);
 
-  // Reset visibleItems on filter change
+  // Reset mobile visible count when filter changes
   useEffect(() => {
-    setVisibleItems(itemsPerPage);
-  }, [showFavorites]);
+    setMobileVisibleCount(itemsPerPage);
+  }, [showFavorites, itemsPerPage]);
 
-  useEffect(() => {
-    if (window.innerWidth < 768 && visibleItems > filteredProducts.length) {
-      setVisibleItems(filteredProducts.length);
-    }
-  }, [filteredProducts.length, visibleItems]);
-
-  // Mobile Pagination
+  // Mobile Pagination - Load more
   const handleLoadMore = () => {
-    setVisibleItems((prev) =>
+    setMobileVisibleCount((prev) =>
       Math.min(prev + itemsPerPage, filteredProducts.length)
     );
   };
@@ -143,10 +133,19 @@ export const Products = () => {
     }
   };
 
-  const itemsToRender =
-    window.innerWidth < 768
-      ? filteredProducts.slice(0, visibleItems)
-      : currentItems;
+  // Determine which items to render based on screen size
+  const isMobile = window.innerWidth < 768;
+  const itemsToRender = isMobile ? mobileItems : currentItems;
+
+  const removeProduct = async (id: number) => {
+    try {
+      await productApi.deleteProduct(id);
+      setProducts((prev) => prev.filter((product) => product.id !== id));
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("Failed to delete product. Please try again.");
+    }
+  };
 
   // Loading state
   if (loading) {
@@ -173,15 +172,6 @@ export const Products = () => {
     );
   }
 
-  const removeProduct = async (id: number) => {
-    try {
-      await productApi.deleteProduct(id);
-      setProducts((prev) => prev.filter((product) => product.id !== id));
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
-
   return (
     <div
       className="relative max-w-[1750px] md:h-[90vh] grid grid-cols-1 md:grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg
@@ -200,9 +190,9 @@ export const Products = () => {
 
       <Link
         to="/create-product"
-        className="absolute top-16 right-20 text-purple-300 text-sm md:text-xl"
+        className="absolute top-[50px] right-10 md:top-16 md:right-20 text-purple-300 md:text-xl"
       >
-        <CgAdd />
+        <CgAdd size={25} />
       </Link>
 
       {/* Cards or No Favorites Message */}
@@ -247,9 +237,10 @@ export const Products = () => {
           </main>
         ))
       )}
-      {/* Pagination Controls (MOBILE) */}
-      <div className="md:hidden flex justify-center mt-8 col-span-full">
-        {visibleItems < filteredProducts.length && (
+
+      {/* Mobile Load More Button */}
+      {isMobile && hasMoreMobileItems && (
+        <div className="md:hidden flex justify-center mt-8 col-span-full">
           <button
             onClick={handleLoadMore}
             className="flex items-center p-2 bg-purple-600 text-white rounded-full
@@ -258,12 +249,12 @@ export const Products = () => {
           >
             <MdKeyboardArrowDown size={22} />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Pagination Controls */}
-      <div className="hidden md:block absolute top-3/4">
-        {filteredProducts.length > 0 && (
+      {/* Desktop Pagination Controls */}
+      {!isMobile && filteredProducts.length > 0 && (
+        <div className="hidden md:block absolute top-3/4">
           <div className="flex justify-center items-center mx-auto mt-8 gap-4">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
@@ -275,7 +266,6 @@ export const Products = () => {
               <MdNavigateBefore />
             </button>
 
-            {/* Render page numbers */}
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index + 1}
@@ -302,8 +292,8 @@ export const Products = () => {
               <MdNavigateNext />
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
