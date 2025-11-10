@@ -4,12 +4,14 @@ import {
   MdNavigateNext,
   MdNavigateBefore,
   MdKeyboardArrowDown,
+  MdRemoveCircle,
 } from "react-icons/md";
 import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { Menu } from "../components/Menu";
 import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 import { useSetLikes } from "../hooks/setLikes";
 import { CgAdd } from "react-icons/cg";
+import { productApi } from "../services/productApi";
 
 export interface Product {
   id: number;
@@ -171,6 +173,15 @@ export const Products = () => {
     );
   }
 
+  const removeProduct = async (id: number) => {
+    try {
+      await productApi.deleteProduct(id);
+      setProducts((prev) => prev.filter((product) => product.id !== id));
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   return (
     <div
       className="relative max-w-[1750px] md:h-[90vh] grid grid-cols-1 md:grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg
@@ -220,10 +231,17 @@ export const Products = () => {
             </Link>
             <div
               className="absolute bottom-0 left-3 p-2 text-2xl z-30 opacity-100 md:opacity-0 md:group-hover:opacity-100
-              transition-opacity duration-300 delay-100 ease-in-out"
+              transition-opacity duration-300 delay-100 space-x-3 ease-in-out"
             >
               <button onClick={() => toggleLike(item.id)}>
                 {isLiked(item.id) ? <FcLike /> : <FcLikePlaceholder />}
+              </button>
+
+              <button
+                className="text-red-600"
+                onClick={() => removeProduct(item.id)}
+              >
+                <MdRemoveCircle />
               </button>
             </div>
           </main>

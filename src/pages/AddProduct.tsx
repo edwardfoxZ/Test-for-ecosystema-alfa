@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { productApi } from "../services/productApi";
 
 interface ProductFormData {
   title: string;
@@ -28,19 +29,8 @@ export const AddProduct = () => {
         },
       };
 
-      const response = await fetch("http://localhost:3001/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(productData),
-      });
+      await productApi.addProduct(productData);
 
-      if (!response.ok) {
-        throw new Error("Failed to add product");
-      }
-
-      await response.json();
       alert("Product added successfully!");
       reset();
       navigate("/products");
