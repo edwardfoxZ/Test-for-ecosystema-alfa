@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Card } from "../components/Card";
-import { fakeData } from "../data/fakeData";
 import {
   MdNavigateNext,
   MdNavigateBefore,
@@ -10,6 +9,7 @@ import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { Menu } from "../components/Menu";
 import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 import { useSetLikes } from "../hooks/setLikes";
+import { CgAdd } from "react-icons/cg";
 
 export interface Product {
   id: number;
@@ -24,18 +24,46 @@ export interface Product {
   };
 }
 
-// We use https://fakestoreapi.com/products for data and put them in fakeData.js
+// Replace fakeData with API calls to http://localhost:3001/products
 
 export const Products = () => {
   const { isLiked, toggleLike, likesList } = useSetLikes();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const [isToggleHambOn, setToggleHamOn] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const currentPage = Number(searchParams.get("page")) || 1;
   const [visibleItems, setVisibleItems] = useState(5);
   const itemsPerPage = 5;
   const showFavorites = searchParams.get("favorites") === "true";
+
+  // Fetch products from your local server
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:3001/products");
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const data = await response.json();
+        setProducts(data);
+        setError(null);
+      } catch (err) {
+        setError("Failed to load products from server");
+        console.error("Error fetching products:", err);
+        // Fallback to empty array if server is not available
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const setShowFavorites = (value: boolean | ((prev: boolean) => boolean)) => {
     let newValue: boolean;
@@ -55,10 +83,9 @@ export const Products = () => {
     setSearchParams(params);
   };
 
-  const fullProducts = fakeData;
   const filteredProducts = showFavorites
-    ? fullProducts.filter((product) => likesList.includes(product.id))
-    : fullProducts;
+    ? products.filter((product) => likesList.includes(product.id))
+    : products;
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -68,7 +95,6 @@ export const Products = () => {
     indexOfLastItem
   );
 
-  // Clamp currentPage if out of bounds
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     let changed = false;
@@ -91,7 +117,6 @@ export const Products = () => {
     setVisibleItems(itemsPerPage);
   }, [showFavorites]);
 
-  // Adjust visibleItems if filtered length changes (e.g., unliking items)
   useEffect(() => {
     if (window.innerWidth < 768 && visibleItems > filteredProducts.length) {
       setVisibleItems(filteredProducts.length);
@@ -121,6 +146,31 @@ export const Products = () => {
       ? filteredProducts.slice(0, visibleItems)
       : currentItems;
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="relative max-w-[1750px] md:h-[90vh] grid grid-cols-1 md:grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg py-32 px-24 rounded-xl md:overflow-hidden">
+        <div className="col-span-full flex items-center justify-center text-white text-xl">
+          Loading products from server...
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="relative max-w-[1750px] md:h-[90vh] grid grid-cols-1 md:grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg py-32 px-24 rounded-xl md:overflow-hidden">
+        <div className="col-span-full flex flex-col items-center justify-center text-white text-xl text-center">
+          <div>{error}</div>
+          <div className="text-sm mt-2">
+            Make sure your server is running at http://localhost:3001
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="relative max-w-[1750px] md:h-[90vh] grid grid-cols-1 md:grid-cols-5 gap-5 mx-auto place-items-center bg-[#3d247116] backdrop-blur-lg
@@ -137,10 +187,21 @@ export const Products = () => {
         />
       </div>
 
+      <Link
+        to="/create-product"
+        className="absolute top-16 right-20 text-purple-300 text-sm md:text-xl"
+      >
+        <CgAdd />
+      </Link>
+
       {/* Cards or No Favorites Message */}
       {showFavorites && filteredProducts.length === 0 ? (
         <div className="col-span-full flex items-center justify-center text-center text-white py-10 text-xl min-h-[50vh]">
           No favorites yet. Start liking some products!
+        </div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="col-span-full flex items-center justify-center text-center text-white py-10 text-xl min-h-[50vh]">
+          No products found.
         </div>
       ) : (
         itemsToRender.map((item) => (

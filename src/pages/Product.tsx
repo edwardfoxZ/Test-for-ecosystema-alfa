@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { FcLikePlaceholder, FcLike } from "react-icons/fc";
-import { fakeData } from "../data/fakeData";
 import type { Product as ProductType } from "./Products";
 import { MdNavigateBefore } from "react-icons/md";
 import { useSetLikes } from "../hooks/setLikes";
@@ -22,29 +21,37 @@ export const Product = () => {
       setError(null);
 
       try {
-        const foundProduct = fakeData.find(
-          (item) => item.id === parseInt(id || "", 10)
-        );
-        if (foundProduct) {
-          setProduct(foundProduct);
-        } else {
-          setError("Product not found");
+        const response = await fetch(`http://localhost:3001/products/${id}`);
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Product not found");
+          }
+          throw new Error("Failed to load product");
         }
+
+        const productData = await response.json();
+        setProduct(productData);
       } catch (err) {
-        setError("Failed to load product");
-        console.error(err);
+        setError(err instanceof Error ? err.message : "Failed to load product");
+        console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
+    if (id) {
+      fetchProduct();
+    } else {
+      setError("No product ID provided");
+      setLoading(false);
+    }
   }, [id]);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[90vh] text-white">
-        Loading...
+        Loading product from server...
       </div>
     );
   }
@@ -52,7 +59,10 @@ export const Product = () => {
   if (error || !product) {
     return (
       <div className="flex flex-col justify-center items-center h-[90vh] text-white">
-        <p>{error || "Product not found"}</p>
+        <p className="text-xl mb-4">{error || "Product not found"}</p>
+        <p className="text-sm mb-4 text-gray-300">
+          Make sure your server is running at http://localhost:3001
+        </p>
         <Link
           to={`/products${location.search}`}
           className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition duration-300"

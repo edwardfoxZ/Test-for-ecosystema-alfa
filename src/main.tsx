@@ -11,6 +11,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { Products } from "./pages/Products.tsx";
 import { Product } from "./pages/Product.tsx";
+import { AddProduct } from "./pages/AddProduct.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
       <Route index element={<Navigate to="/products" />} />
       <Route path="/products" element={<Products />} />
       <Route path="products/product/:id" element={<Product />} />
+      <Route path="/create-product" element={<AddProduct />} />
     </Route>
   )
 );
