@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+🛍️ E-Commerce Product Management App
+A modern, responsive e-commerce application built with React, TypeScript, and Node.js that allows users to browse, manage, and interact with products in a beautiful interface.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+✨ Features
+🎯 Core Functionality
+Product Catalog - Browse through a wide range of products with beautiful cards
 
-Currently, two official plugins are available:
+Product Details - View detailed information about each product
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Add New Products - Simple form to add new products to the catalog
 
-## React Compiler
+Delete Products - Remove products with confirmation dialog
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Favorites System - Like/unlike products with persistent local storage
 
-## Expanding the ESLint configuration
+🎨 User Experience
+Responsive Design - Perfect experience on desktop, tablet, and mobile
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Smart Pagination - Desktop: traditional pagination, Mobile: infinite scroll
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Search & Filter - Filter products by favorites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Modern UI - Glass morphism design with smooth animations
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Loading States - Elegant loading indicators
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+🔧 Technical Features
+TypeScript - Full type safety throughout the application
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+React Router - Seamless navigation between pages
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+React Hook Form - Robust form handling with validation
+
+Custom Hooks - Reusable logic for state management
+
+RESTful API - Full CRUD operations with JSON Server
+
+🚀 Quick Start
+Live Demo: https://test-for-ecosystema-alfa.vercel.app/
+
+Prerequisites
+Node.js 16+
+
+npm or yarn
+
+Installation
+Clone the repository
+
+bash
+git clone https://github.com/your-username/ecommerce-app.git
+cd ecommerce-app
+Install dependencies
+
+bash
+# Install frontend dependencies
+npm install
+
+# Install backend dependencies
+cd backend
+npm install
+cd ..
+Start the development servers
+
+Terminal 1 - Backend Server:
+
+bash
+cd backend
+npm start
+Server runs on http://localhost:3001
+
+Terminal 2 - Frontend Development:
+
+bash
+npm run dev
+Frontend runs on http://localhost:5173 (or similar Vite port)
+
+Open your browser
+Navigate to http://localhost:5173 to see the application.
